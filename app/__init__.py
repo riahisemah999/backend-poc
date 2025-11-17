@@ -38,11 +38,12 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # Run migrations on server start to ensure database is up to date
+    # Reset database from scratch and apply all migrations on server start
     with app.app_context():
-        from flask_migrate import upgrade
+        from flask_migrate import downgrade, upgrade
+        downgrade(revision='base')
         upgrade()
-        print("Database migrations applied successfully.")
+        print("Database reset from scratch and migrations applied successfully.")
 
     # Register blueprints
     from app.routes.profiles import profiles_bp
