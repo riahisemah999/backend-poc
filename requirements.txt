@@ -13,3 +13,4 @@ pymysql
 spacy
 pydantic[email]
 scikit-learn
+SQLAlchemy>=2.0.0

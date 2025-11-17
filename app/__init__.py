@@ -18,14 +18,14 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    #app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:@localhost:3306/neoleaders_db"
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:LUKqlGtRDyVwPriIcDKqKVZiXClQihtw@mysql.railway.internal:3306/railway"
-
-    #app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:TLXOIOGAkHNgdDmlUxNQcAPMCMNFyJdV@switchback.proxy.rlwy.net:33388/railway"
+    
+    # ✅ FIX: Use mysql+pymysql:// instead of mysql://
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:LUKqlGtRDyVwPriIcDKqKVZiXClQihtw@mysql.railway.internal:3306/railway"
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     
-    # ✅ UNE SEULE CONFIGURATION CORS PROPRE
+    # ✅ CORS Configuration
     CORS(app,
          origins=["https://p-oc.netlify.app", "http://localhost:3000", "http://localhost:8080", "http://127.0.0.1:8080"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
@@ -48,10 +48,6 @@ def create_app():
     from app.routes.messages import messages_bp
     from app.routes.analysis import analysis_bp
     from app.routes.community import community_bp
-
-    # ❌ SUPPRIMEZ les CORS sur chaque blueprint
-    # ❌ SUPPRIMEZ @app.before_request
-    # ❌ SUPPRIMEZ @app.after_request
 
     app.register_blueprint(profiles_bp, url_prefix='/api/profiles')
     app.register_blueprint(export_bp, url_prefix='/api/export')
