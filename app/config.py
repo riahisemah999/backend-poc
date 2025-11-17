@@ -18,7 +18,7 @@ def create_app():
          expose_headers="*")  # ✅ Expose tous les headers
 
     # ✅ FIX: Use mysql+pymysql:// instead of mysql://
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://poc:pouqanikvvdr@europe-north1-001.proxy.kinsta.app:30884/poc"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:LUKqlGtRDyVwPriIcDKqKVZiXClQihtw@mysql.railway.internal:3306/railway"
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

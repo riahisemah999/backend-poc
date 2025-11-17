@@ -19,7 +19,7 @@ def create_app():
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     
-    # ✅ FIX: Use mysql+pymysql:// instead of mysql://
+    # Railway MySQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:LUKqlGtRDyVwPriIcDKqKVZiXClQihtw@mysql.railway.internal:3306/railway"
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -38,12 +38,46 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # Reset database from scratch and apply all migrations on server start
+    # Apply all migrations on server start to ensure database is up to date
     with app.app_context():
-        from flask_migrate import downgrade, upgrade
-        downgrade(revision='base')
+        from flask_migrate import upgrade
         upgrade()
-        print("Database reset from scratch and migrations applied successfully.")
+        print("Database migrations applied successfully.")
+
+        # Import data from SQL file to Railway database
+        import pymysql
+        try:
+            conn = pymysql.connect(
+                host='mysql.railway.internal',
+                user='root',
+                password='LUKqlGtRDyVwPriIcDKqKVZiXClQihtw',
+                database='railway',
+                port=3306
+            )
+            cursor = conn.cursor()
+
+            # Read and execute SQL file
+            with open('neoleaders_db.sql', 'r', encoding='utf-8') as f:
+                sql = f.read()
+
+            # Split SQL into individual statements and execute only INSERT statements
+            statements = sql.split(';')
+
+            for statement in statements:
+                statement = statement.strip()
+                if statement and statement.upper().startswith('INSERT'):
+                    try:
+                        cursor.execute(statement)
+                        print(f"Executed INSERT statement successfully")
+                    except Exception as e:
+                        print(f"Error executing INSERT: {e}")
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("Database data imported successfully from neoleaders_db.sql to Railway")
+        except Exception as e:
+            print(f"Error importing database data: {e}")
 
     # Register blueprints
     from app.routes.profiles import profiles_bp
