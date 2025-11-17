@@ -38,6 +38,11 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
+    # Create tables if they don't exist (first time server start)
+    with app.app_context():
+        db.create_all()
+        print("Tables created successfully.")
+
     # Register blueprints
     from app.routes.profiles import profiles_bp
     from app.routes.export import export_bp
