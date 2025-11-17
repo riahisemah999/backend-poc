@@ -38,13 +38,8 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # Apply all migrations on server start to ensure database is up to date
+    # Reset database from SQL file
     with app.app_context():
-        from flask_migrate import upgrade
-        upgrade()
-        print("Database migrations applied successfully.")
-
-        # Import data from SQL file to Railway database
         import pymysql
         try:
             conn = pymysql.connect(
@@ -56,28 +51,35 @@ def create_app():
             )
             cursor = conn.cursor()
 
-            # Read and execute SQL file
+            # Drop all existing tables
+            cursor.execute("SHOW TABLES")
+            tables = cursor.fetchall()
+            for table in tables:
+                cursor.execute(f"DROP TABLE IF EXISTS {table[0]}")
+            print("All existing tables dropped.")
+
+            # Read and execute entire SQL file
             with open('neoleaders_db.sql', 'r', encoding='utf-8') as f:
                 sql = f.read()
 
-            # Split SQL into individual statements and execute only INSERT statements
+            # Split SQL into individual statements
             statements = sql.split(';')
 
             for statement in statements:
                 statement = statement.strip()
-                if statement and statement.upper().startswith('INSERT'):
+                if statement:
                     try:
                         cursor.execute(statement)
-                        print(f"Executed INSERT statement successfully")
+                        print(f"Executed statement successfully")
                     except Exception as e:
-                        print(f"Error executing INSERT: {e}")
+                        print(f"Error executing statement: {e}")
 
             conn.commit()
             cursor.close()
             conn.close()
-            print("Database data imported successfully from neoleaders_db.sql to Railway")
+            print("Database recreated successfully from neoleaders_db.sql")
         except Exception as e:
-            print(f"Error importing database data: {e}")
+            print(f"Error resetting database: {e}")
 
     # Register blueprints
     from app.routes.profiles import profiles_bp
