@@ -38,10 +38,11 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # Create tables if they don't exist (first time server start)
+    # Run migrations on server start to ensure database is up to date
     with app.app_context():
-        db.create_all()
-        print("Tables created successfully.")
+        from flask_migrate import upgrade
+        upgrade()
+        print("Database migrations applied successfully.")
 
     # Register blueprints
     from app.routes.profiles import profiles_bp
