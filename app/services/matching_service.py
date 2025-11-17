@@ -7,12 +7,20 @@ import re
 import difflib
 import json
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 from datetime import datetime
 import logging
 from collections import Counter
 from pathlib import Path
+
+def custom_cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
+    """Custom cosine similarity to avoid sklearn dependency."""
+    dot_product = np.dot(vec1, vec2)
+    norm1 = np.linalg.norm(vec1)
+    norm2 = np.linalg.norm(vec2)
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+    return dot_product / (norm1 * norm2)
 
 # Safe spaCy (optionnel)
 try:
@@ -242,7 +250,7 @@ class MatchingService:
             o_vec = opp['skill_vector']
             
             # Tailles toujours identiques avec custom vectorizer
-            similarity = cosine_similarity([p_vec], [o_vec])[0, 0]
+            similarity = custom_cosine_similarity(p_vec, o_vec)
             return min(100.0, similarity * 100)
         except Exception as e:
             logger.warning(f"Vector match fallback: {e}")

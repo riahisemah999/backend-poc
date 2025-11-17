@@ -12,3 +12,4 @@ pydantic==2.8.2
 pymysql
 spacy
 pydantic[email]
+scikit-learn
