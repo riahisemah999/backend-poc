@@ -19,7 +19,7 @@ def create_app():
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     #app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:@localhost:3306/neoleaders_db"
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://poc:pouqanikvvdr@europe-north1-001.proxy.kinsta.app:30884/poc"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:LUKqlGtRDyVwPriIcDKqKVZiXClQihtw@mysql.railway.internal:3306/railway"
 
     #app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:TLXOIOGAkHNgdDmlUxNQcAPMCMNFyJdV@switchback.proxy.rlwy.net:33388/railway"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
