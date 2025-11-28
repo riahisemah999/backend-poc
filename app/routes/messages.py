@@ -4,6 +4,7 @@ from app.models.Message import Message
 from app.models.User import User
 from app.models.LinkedInLead import LinkedInLead
 from app import db
+from app.services.crm_service import crm_service
 from pydantic import BaseModel, ValidationError
 from typing import Optional
 from sqlalchemy import or_, and_
@@ -29,7 +30,7 @@ class MessageUpdateSchema(BaseModel):
     read_status: Optional[bool] = None
 
 # Constantes
-N8N_URL = "https://n8n-render-free-2lub.onrender.com:10000/webhook/e5175fdd-fd1d-4257-ba26-865a9233c7fe"
+N8N_URL = "https://n8n-render-free-2lub.onrender.com/webhook-test/e5175fdd-fd1d-4257-ba26-865a9233c7fe"
 REQUEST_TIMEOUT = 3000
 
 # Utilitaires
@@ -413,6 +414,28 @@ def trigger_linkedin_leads():
                                         handle_database_operation(db.session.add, new_lead)
                                         handle_database_operation(db.session.commit)
                                         logger.info(f"Lead saved automatically: {new_lead.full_name}")
+
+                                        # Send lead to CRM
+                                        #try:
+                                        #    crm_contact_data = {
+                                        #        "organisation_id": 9,  # TODO: Get from authenticated user
+                                        #        "name": new_lead.full_name,
+                                        #        "email": f"{new_lead.full_name.lower().replace(' ', '.')}@example.com",  # Placeholder email
+                                        #        "phone": "",  # Not available in LinkedIn data
+                                        #        "company": new_lead.company or new_lead.entreprise or "",
+                                        #        "position": new_lead.position or new_lead.title or new_lead.job_title or "",
+                                        #        "location": new_lead.location or "",
+                                        #        "status": "Active"
+                                        #    }
+#
+                                        #    crm_result = crm_service.add_contact(crm_contact_data)
+                                        #    if crm_result:
+                                        #        logger.info(f"Lead sent to CRM: {new_lead.full_name}")
+                                        #    else:
+                                        #        logger.warning(f"Failed to send lead to CRM: {new_lead.full_name}")
+#
+                                        #except Exception as crm_e:
+                                        #    logger.error(f"Error sending lead to CRM: {crm_e}")
 
                                     except Exception as e:
                                         logger.error(f"Error saving lead: {e}")
